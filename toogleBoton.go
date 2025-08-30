@@ -17,7 +17,7 @@ type ToogleButton struct {
 	Estado  Estado
 	fondo   *Frame
 	corners [4]bool
-	fn      func()
+	Def     func()
 	icon    *pixel.Sprite
 	List    *[]*ToogleButton
 	conf    *Css
@@ -29,7 +29,7 @@ func NewToogelButton(icon *pixel.Sprite, s string, fn func(), esq [4]bool, conf 
 	tbtn.posAbs = &P{0, 0}
 	tbtn.Estado = Normal
 	tbtn.corners = esq
-	tbtn.fn = fn
+	tbtn.Def = fn
 	tbtn.icon = icon
 	tbtn.conf = entregarCss(conf, CssDefaultToogleButton)
 	tbtn.Texto = NewLabel(s, 100, Line_height, nil, tbtn.conf)
@@ -119,8 +119,8 @@ func (tbtn *ToogleButton) cambiarEstado(pt *P) {
 				//deja solamente al actual en activo
 				tbtn.Estado = Active
 
-				if tbtn.fn != nil {
-					tbtn.fn()
+				if tbtn.Def != nil {
+					tbtn.Def()
 				}
 			}
 		}

@@ -15,18 +15,46 @@ type ComboBox struct {
 	list []*etiqueta
 	i    int
 	mt   *MenuItem
+	Def  func()
 	conf *Css
 }
 
-func NewComboBox(w float64, list []string, conf *Css) *ComboBox {
+func NewComboBox(w float64, fn func(), esq [4]bool, conf *Css) *ComboBox {
 	cb := &ComboBox{}
 	cb.conf = entregarCss(conf, CssDefaultComboBox)
-	cb.Button = NewButton(nil, "Nil", nil, AllCircularEdges, cb.conf)
+	cb.Button = NewButton(nil, "Nil", nil, esq, cb.conf)
+	cb.Button.SetSize(w, Line_height)
 	cb.mt = NewMenuItem(w, Line_height*6, nil)
-	cb.Add(list...)
+	cb.list = []*etiqueta{}
 	cb.i = 0
+	cb.Def = fn
 	cb.Button.fn = cb.desplegarLista
 	return cb
+}
+
+func (cb *ComboBox) SetInt(i int) {
+	cb.i = i
+	for j, et := range cb.list {
+		if i == j {
+			et.estado = Active
+			et.sel = true
+		} else {
+			et.estado = Normal
+			et.sel = false
+		}
+	}
+	cb.Texto.S = cb.list[i].text.S
+}
+
+func (cb *ComboBox) SetItem(s string, i int) {
+	cb.list[i].text.S = s
+	if cb.i == i {
+		cb.Texto.S = s
+	}
+}
+
+func (cb *ComboBox) SetSurface(w float64, h float64) {
+	cb.mt.SetSize(w, h)
 }
 
 func (cb *ComboBox) Add(list ...string) {
@@ -43,16 +71,15 @@ func (cb *ComboBox) Add(list ...string) {
 					cb.Texto.S = obj.text.S
 				}
 			}
+			if cb.Def != nil {
+				cb.Def()
+			}
 			mouse.foco = nil
 			FocoItems = nil
 		}
 		//-------------- * ---------------
 		cb.list = append(cb.list, et)
 		cb.mt.Add(et)
-		//en caso de ser el primer lemento se selecciona
-		if len(cb.list) == 1 {
-			cb.Selecionar(0)
-		}
 	}
 }
 
@@ -78,9 +105,26 @@ func (cb *ComboBox) AddEtiqueta(objetos ...*etiqueta) {
 	}
 }
 
+func (cb *ComboBox) GetList() (lista []string) {
+	for _, et := range cb.list {
+		lista = append(lista, et.text.S)
+	}
+	return lista
+}
+
 // retorna el texto seleccionado
-func (cb *ComboBox) Get() string {
+func (cb *ComboBox) GetString() string {
 	return cb.list[cb.i].text.S
+}
+
+func (cb *ComboBox) GetInt() int {
+	return cb.i
+}
+
+// elimina a todos lo objetos contenidos en el comboBox
+func (cb *ComboBox) Clear() {
+	cb.list = []*etiqueta{}
+	cb.mt.area.sizer.Clear()
 }
 
 func (cb *ComboBox) desplegarLista() {

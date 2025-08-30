@@ -116,6 +116,10 @@ var (
 	TopCircularEdges    = [4]bool{true, true, false, false}
 	ButtomCircularEdges = [4]bool{false, false, true, true}
 	NotCircularEdges    = [4]bool{false, false, false, false}
+	CornerButtonLEdge   = [4]bool{false, false, true, false}
+	CornerButtonREdge   = [4]bool{false, false, false, true}
+	CornerTopLEdge      = [4]bool{true, false, false, false}
+	CornerTopREdge      = [4]bool{false, true, false, false}
 
 	Blanco         = color.RGBA{255, 255, 255, 255}
 	gris           = color.RGBA{180, 180, 180, 255}
@@ -136,6 +140,21 @@ var (
 		border_Color:  negro,
 		Normal_color:  gris_claro,
 		Over_color:    Blanco,
+		Press_color:   naranja,
+		Active_color:  naranja,
+		// Text_Aling:       Center,
+		Text_color:       negro,
+		Text_color_label: negro,
+		Bar_color:        gris_oscuro,
+	}
+
+	Basic_Rect_ClaroTrans = &Basic{
+		Border_Width:  1,
+		Border_Radius: 5,
+		Background:    gris,
+		border_Color:  transparente,
+		Normal_color:  transparente,
+		Over_color:    transparente,
 		Press_color:   naranja,
 		Active_color:  naranja,
 		// Text_Aling:       Center,
@@ -168,7 +187,7 @@ var (
 		Bar_color:        naranja,
 		Normal_color:     grafito,
 		Over_color:       grafito_oscuro,
-		Press_color:      grafito,
+		Press_color:      grafito_claro,
 		Active_color:     naranja,
 		Text_color:       Blanco,
 		Text_color_label: Blanco,
@@ -184,10 +203,14 @@ var (
 		Margin_left: 40,
 	}
 	CssDefaultBoton = &Css{
-		Basic: Basic_Rect_Claro,
+		Basic:      Basic_Rect_Claro,
+		Text_Aling: Center,
+	}
+	CssDefaultBotonTrans = &Css{
+		Basic: Basic_Rect_ClaroTrans,
 	}
 	CssDefaultSpin = &Css{
-		Basic:      Basic_Rect_Oscuro,
+		Basic:      Basic_Rect_Claro,
 		Text_Aling: Center,
 	}
 	CssDefaultEntry = &Css{
@@ -223,7 +246,7 @@ var (
 		Expand_width: true,
 	}
 	CssDefaultComboBox = &Css{
-		Basic: Basic_Rect_Claro,
+		Basic: Basic_Rect_Oscuro,
 	}
 	CssDefaultListBox = &Css{
 		Basic:        Basic_Rect_medio,

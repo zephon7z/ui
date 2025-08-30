@@ -25,7 +25,7 @@ type Panel struct {
 	*R
 	superficie *pixelgl.Canvas
 	direccion  Direction
-	BtnPestana []*ToogleButton
+	BtnTab     []*ToogleButton
 	ListSizer  []*BoxSize
 	Area       *Area
 	fondo      *Frame
@@ -40,8 +40,8 @@ func NewPanel(d Direction, posTab Position, conf *Css) *Panel {
 	pl.R = NewR(0, 0, 200, 200)
 	pl.direccion = d
 	pl.posTab = posTab
-	pl.BtnPestana = []*ToogleButton{}
-	pl.ListSizer = []*BoxSize{}
+	pl.BtnTab = []*ToogleButton{} //lista que usa el toogleButton para cambiar
+	pl.ListSizer = []*BoxSize{}   //lista de boxSiser por Tab que se muestran en el area
 	pl.conf = entregarCss(conf, CssDefaultPanel)
 	pl.Area = NewArea(100, 100, nil)
 	pl.Sizer = NewBoxSizer(Horizontal, &Css{Margin: 10})
@@ -49,8 +49,8 @@ func NewPanel(d Direction, posTab Position, conf *Css) *Panel {
 	pl.PosTab()
 	// pl.Sizer.Add(pl.sizerTab, pl.Area)
 	pl.fondo = NewFrame(pl.R, pl.conf.Border_Radius, pl.conf.Border_Width, AllCircularEdges, pl.conf.border_Color, pl.conf.Background)
-	pl.NewTab(nil, "default", 50)
-	pl.ListSizer[0] = pl.Area.sizer
+	// pl.NewTab(nil, "default", 50)
+	// pl.ListSizer[0] = pl.Area.sizer
 	return pl
 }
 
@@ -60,22 +60,28 @@ func (pl *Panel) NewTab(ico *pixel.Sprite, s string, w float64) {
 	bordes = entregarBordes(pl.posTab)
 	tb := NewToogelButton(ico, s, nil, bordes, nil)
 
-	tb.fn = func() {
-		for i, obj := range pl.BtnPestana {
+	tb.Def = func() {
+		for i, obj := range pl.BtnTab {
 			if obj == tb {
 				pl.Area.sizer = pl.ListSizer[i]
+				pl.Area.barH.size = pl.ListSizer[i]
+				pl.Area.barH.calcLargoBarra()
 			}
 		}
 	}
 	tb.SetSize(w, Line_height)
 
-	pl.BtnPestana = append(pl.BtnPestana, tb)
-	tb.List = &pl.BtnPestana
+	pl.BtnTab = append(pl.BtnTab, tb)
+	tb.List = &pl.BtnTab
 	sizer := NewBoxSizer(Vertical, nil)
 
 	pl.ListSizer = append(pl.ListSizer, sizer)
 	pl.sizerTab.Add(tb)
-	tb.List = &pl.BtnPestana
+	tb.List = &pl.BtnTab
+
+	//en caso de ser la primera pestaña se borra la default y se deja como la principal
+	pl.Area.sizer = pl.ListSizer[0]
+	pl.BtnTab[0].Estado = Active
 
 }
 
@@ -150,6 +156,13 @@ func (pl *Panel) GetProp() *Css {
 }
 
 func (pl Panel) Redimensionar(pt *P) {
+	// if pl.conf.Resize == true{
+	// 	if mouse.Click && pl.CollideP(pt){
+	// 		if Abs(pl.X -pt.X) < 10 || Abs(pl.X - (pl.X + pl.W))< 10 {
+
+	// 		}
+	// 	}
+	// }
 }
 
 func (pl *Panel) Accionar(pt *P) {
@@ -158,7 +171,7 @@ func (pl *Panel) Accionar(pt *P) {
 
 func (pl *Panel) redimensionarArea() {
 	var w, h float64
-	if len(pl.BtnPestana) <= 1 {
+	if len(pl.BtnTab) <= 1 {
 		w = pl.W - 20
 		h = pl.H
 	} else {

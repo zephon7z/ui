@@ -35,14 +35,14 @@ type Button struct {
 
 func NewButton(icon *pixel.Sprite, s string, fn func(), esq [4]bool, clase *Css) *Button {
 	btn := &Button{}
+	btn.conf = entregarCss(clase, CssDefaultBoton)
 	btn.R = NewR(0, 0, 100, Line_height)
 	btn.posAbs = &P{0, 0}
-	btn.Texto = NewLabel(s, 100, Line_height, nil, CssDefaultLabelButton)
+	btn.Texto = NewLabel(s, 100, Line_height, nil, btn.conf)
 	btn.Estado = Normal
 	btn.corners = esq
 	btn.fn = fn
 	btn.icon = icon
-	btn.conf = entregarCss(clase, CssDefaultBoton)
 	btn.fondo = NewFrame(btn.R, btn.conf.Border_Radius, btn.conf.Border_Width, esq, btn.conf.border_Color, btn.conf.Normal_color)
 	return btn
 }

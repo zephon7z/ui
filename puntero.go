@@ -9,14 +9,16 @@ import (
 
 type Puntero struct {
 	*P
-	Click  bool
-	Soltar bool
-	Press  bool
-	Objeto Widget
-	Dx     float64
-	Dy     float64
-	Scroll float64
-	foco   any
+	Click    bool
+	Soltar   bool
+	Press    bool
+	FijarPos bool
+	FijarH   bool
+	Objeto   Widget
+	Dx       float64
+	Dy       float64
+	Scroll   float64
+	foco     any
 }
 
 type Widget interface {
@@ -42,6 +44,19 @@ func (pt *Puntero) Detectar(win *pixelgl.Window) {
 	pt.Y = win.MousePosition().Y
 	pt.Dx = pt.X - win.MousePreviousPosition().X
 	pt.Dy = pt.Y - win.MousePreviousPosition().Y
+	//se fija el movimiento del mouse
+	if mouse.FijarPos {
+		p := win.MousePreviousPosition()
+		win.SetMousePosition(pixel.V(p.X, p.Y))
+		pt.X = win.MousePosition().X
+		pt.Y = win.MousePosition().Y
+	}
+	if mouse.FijarH {
+		p := win.MousePreviousPosition()
+		win.SetMousePosition(pixel.V(win.MousePosition().X, p.Y))
+		pt.Y = win.MousePosition().Y
+	}
+
 	pt.Soltar = false
 	if win.Pressed(pixelgl.MouseButtonLeft) {
 		pt.Press = true
@@ -59,5 +74,4 @@ func (pt *Puntero) Detectar(win *pixelgl.Window) {
 		// pt.foco = nil
 	}
 	mouse.Scroll = win.MouseScroll().Y
-
 }

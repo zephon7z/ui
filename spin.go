@@ -25,7 +25,9 @@ type Spin struct {
 	btnDer     *Button
 	estado     Estado
 	fondos     map[Estado]*Frame
+	frente     *Frame
 	corners    [4]bool
+	Def        func()
 	conf       *Css
 }
 
@@ -39,21 +41,26 @@ func NewSpin(w float64, s string, atlas *text.Atlas, esq [4]bool, conf *Css) *Sp
 	sp.cadenaS = s
 	sp.corners = esq
 	sp.incremento = 1.
-	esqI := [4]bool{esq[0], false, esq[1], false}
-	sp.btnIzq = NewButton(nil, "<", sp.restaVal, esqI, sp.conf)
-	sp.btnIzq.SetSize(20, Cell_height)
-	esqD := [4]bool{false, esq[2], false, esq[3]}
-	sp.btnDer = NewButton(nil, ">", sp.sumarVal, esqD, sp.conf)
-	sp.btnDer.SetSize(20, Cell_height)
+	esqI := [4]bool{esq[0], false, esq[2], false}
+	sp.btnIzq = NewButton(nil, "<", sp.restaVal, esqI, CssDefaultBotonTrans)
+	sp.btnIzq.SetSize(20, Cell_height-1)
+	esqD := [4]bool{false, esq[1], false, esq[3]}
+	sp.btnDer = NewButton(nil, ">", sp.sumarVal, esqD, CssDefaultBotonTrans)
+	sp.btnDer.SetSize(20, Cell_height-1)
 	sp.fondos = map[Estado]*Frame{
-		Normal: NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, sp.conf.border_Color, sp.conf.Normal_color),
-		Over:   NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, sp.conf.border_Color, sp.conf.Over_color),
-		Press:  NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, sp.conf.border_Color, sp.conf.Active_color),
-		Active: NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, sp.conf.border_Color, sp.conf.Active_color),
+		Normal: NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, transparente, sp.conf.Normal_color),
+		Over:   NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, transparente, sp.conf.Over_color),
+		Press:  NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, transparente, sp.conf.Active_color),
+		Active: NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, transparente, sp.conf.Active_color),
 	}
+	sp.frente = NewFrame(sp.R, sp.conf.Border_Radius, sp.conf.Border_Width, esq, sp.conf.border_Color, transparente)
 	sp.centroR = NewR(0, 0, w, Cell_height)
 	sp.setCentroR()
 	return sp
+}
+
+func (sp *Spin) SetIncremento(val float64) {
+	sp.incremento = val
 }
 
 func (sp *Spin) setCentroR() {
@@ -103,15 +110,16 @@ func (sp *Spin) restaVal() {
 func (sp *Spin) cambiarEstado(pt *P) {
 	if mouse.foco == nil {
 		sp.estado = Normal
-		if sp.centroR.CollideP(pt) {
+		if sp.CollideP(pt) {
 			sp.estado = Over
-			if mouse.Soltar {
+			if mouse.Soltar && sp.centroR.CollideP(pt) {
 				sp.estado = Active
 				sp.darFoco()
 			}
 			if mouse.Press && mouse.Dx != 0 {
 				sp.estado = Press
 				mouse.foco = sp
+				mouse.FijarPos = true
 			}
 		}
 	}
@@ -138,11 +146,19 @@ func (sp *Spin) Accionar(pt *P) {
 	sp.btnIzq.Accionar(pt)
 	sp.btnDer.Accionar(pt)
 	sp.cambiarEstado(pt)
-	if sp.estado == Press {
+	if sp.estado == Press && mouse.foco == sp {
 		if mouse.Dx != 0 {
 			sp.Val += (mouse.Dx * sp.incremento) / 3
+			if sp.Def != nil {
+				sp.Def()
+			}
 		}
 
+	}
+	if mouse.Soltar && sp.CollideP(pt) && (mouse.foco == nil || mouse.foco == sp) {
+		if sp.Def != nil {
+			sp.Def()
+		}
 	}
 }
 
@@ -173,4 +189,5 @@ func (sp *Spin) Dib(target pixel.Target) {
 		sp.texto.S = fmt.Sprintf(sp.cadenaS, sp.Val)
 	}
 	sp.TypeWriter.Dib(target)
+	sp.frente.Dib(target)
 }

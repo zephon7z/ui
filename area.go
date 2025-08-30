@@ -37,6 +37,11 @@ func (ar *Area) Add(lista ...Dimensionable) {
 	ar.ajustarArea()
 }
 
+func (ar *Area) Remove(i int) {
+	ar.sizer.Remove(i)
+	ar.barH.calcLargoBarra()
+}
+
 func (ar *Area) SetPos(x float64, y float64) {
 	ar.X = x
 	ar.Y = y
@@ -54,6 +59,7 @@ func (ar *Area) SetSize(w float64, h float64) {
 	ar.W = w
 	ar.H = h
 	ar.ajustarArea()
+	ar.barH.calcLargoBarra()
 }
 
 func (ar *Area) GetSize() (float64, float64) {
@@ -99,7 +105,7 @@ func (ar *Area) ajustarArea() {
 	}
 	w := ar.superficie.Bounds().W()
 	_, h := ar.sizer.GetSize()
-	ar.barH.SetSize(Bar_width, ar.H)
+	ar.barH.SetSize(Bar_width, ar.superficie.Bounds().H())
 	ar.sizer.SetSize(w, h)
 }
 
@@ -115,13 +121,15 @@ func (ar *Area) Accionar(pt *P) {
 	// if barH {
 	// }
 	ar.barH.Accionar(pt)
-	if ar.rSup.CollideP(pt) {
-		pti := &P{}
-		pti.X = pt.X - ar.X
-		pti.Y = pt.Y - ar.Y
-		ar.sizer.Accionar(pti)
-	}
-
+	// if ar.rSup.CollideP(pt) {
+	pti := &P{}
+	pti.X = pt.X - ar.X
+	pti.Y = pt.Y - ar.Y
+	ar.sizer.Accionar(pti)
+	// }
+	/*Al agreegar el condicional de que choque el puntero con el area provoca bugs en
+	el combobox y en otros porque no se actualizan los estados de los objetos
+	contenidos */
 }
 
 func (ar *Area) Dib(target pixel.Target) {

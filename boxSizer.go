@@ -41,6 +41,14 @@ func (bs *BoxSize) Add(objetos ...Dimensionable) {
 
 }
 
+func (bs *BoxSize) Remove(i int) {
+	bs.Objetos = append(bs.Objetos[:i], bs.Objetos[i+1:]...)
+}
+
+func (bs *BoxSize) Clear() {
+	bs.Objetos = []Dimensionable{}
+}
+
 func (bs *BoxSize) SetPos(x float64, y float64) {
 	bs.X = x
 	bs.Y = y

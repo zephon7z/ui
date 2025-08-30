@@ -22,7 +22,7 @@ func NewIconButton(w float64, icon *pixel.Sprite, s string, conf *Css) *IconButt
 	ib.ToogleButton = NewToogelButton(icon, s, nil, AllCircularEdges, prop)
 	ib.conf = entregarCss(conf, CssDefaultComboBox)
 	ib.mt = NewMenuItem(200, 200, nil)
-	ib.fn = ib.desplegarLista
+	ib.Def = ib.desplegarLista
 	return ib
 }
 

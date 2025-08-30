@@ -5,14 +5,15 @@ import (
 
 	// "image/color"
 
+	// "github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
 
 var (
-	W              float64 = 100.
-	H              float64 = 100.
-	mouse                  = NewPuntero()
-	div_main       *Div
+	W     float64 = 100.
+	H     float64 = 100.
+	mouse         = NewPuntero()
+	// div_main       *Div
 	SizerPrincipal *BoxSize
 	lienzo         *pixelgl.Canvas
 	focoTypeWriter *TypeWriter
@@ -33,8 +34,8 @@ func RunApp(win *pixelgl.Window, deltaTiempo float64) {
 	w := win.Bounds().W()
 	h := win.Bounds().H()
 	verfificarDimension(w, h)
-	SizerPrincipal.Dib(win)
 	mouse.Detectar(win)
+	SizerPrincipal.Dib(win)
 	if len(FocoItems) > 0 {
 		//ejecuta las acciones de los items
 		accionarItems()
@@ -53,11 +54,16 @@ func RunApp(win *pixelgl.Window, deltaTiempo float64) {
 	for _, obj := range FocoItems {
 		obj.Dib(win)
 	}
+
+	if mouse.Soltar {
+		mouse.FijarPos = false
+	}
 	// ctx.Draw(win)
-	div_main.Dib(win)
+	// div_main.Dib(win)
 }
 
 func accionarItems() {
+
 	//cierra los menus o items emergentes
 	if mouse.Soltar && mouse.foco == nil {
 		cerrar := true
@@ -69,6 +75,7 @@ func accionarItems() {
 		if cerrar {
 			FocoItems = nil
 		}
+
 	}
 	if FocoItems != nil {
 		//hace funcionar los widgets dentro de los items
@@ -80,4 +87,8 @@ func verfificarDimension(w float64, h float64) {
 	if SizerPrincipal.W != w || SizerPrincipal.H != h {
 		SizerPrincipal.SetSize(w, h)
 	}
+}
+
+func GetMousePos() *P {
+	return mouse.P
 }

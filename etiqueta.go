@@ -28,7 +28,7 @@ func NewEtiqueta(w float64, h float64, icon *pixel.Sprite, s string, la string, 
 	et.conf = entregarCss(conf, CssDefaultEtiqueta)
 	et.text = NewLabel(s, 100, h, nil, et.conf)
 	et.text.tresPuntos = false
-	et.text.AjustarAlAncho()
+	// et.text.AjustarAlAncho()
 	et.label = NewLabel(la, 100, h, nil, nil)
 	et.label.tresPuntos = false
 	et.label.AjustarAlAncho()
@@ -89,6 +89,7 @@ func (et *etiqueta) cambiarEstado(pt *P) {
 
 func (et etiqueta) Accionar(pt *P) {
 	et.cambiarEstado(pt)
+	// fmt.Println(et.estado, "----------------------------")
 	switch et.estado {
 	case Normal:
 		et.fondo.colorBg = et.conf.Normal_color
@@ -122,12 +123,24 @@ func (et *etiqueta) ubicarElementos() {
 		x += et.icon.Frame().W()
 	}
 	et.text.SetPos(x, et.Y)
+	et.text.W = et.W - et.label.W - et.conf.Border_Radius*2 - et.conf.Margin
 
-	et.label.X = et.X + et.W - et.label.W - et.conf.Border_Radius - et.conf.Margin
+	et.label.X = et.X + et.text.X + et.text.W
 	et.label.Y = et.Y
 }
 
 func (et *etiqueta) Dib(target pixel.Target) {
+	// fmt.Println(et.estado, "dib")
+	// switch et.estado {
+	// case Normal:
+	// 	et.fondo.colorBg = et.conf.Normal_color
+	// case Over:
+	// 	et.fondo.colorBg = et.conf.Over_color
+	// case Press:
+	// 	et.fondo.colorBg = et.conf.Press_color
+	// case Active:
+	// 	et.fondo.colorBg = et.conf.Active_color
+	// }
 	et.fondo.Dib(target)
 	if et.icon != nil {
 		mat := pixel.IM

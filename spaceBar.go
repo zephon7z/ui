@@ -115,6 +115,10 @@ func (sb *spaceBar) Accionar(pt *P) {
 	sb.cambiarEstado(pt)
 	sb.moverBar(pt)
 	sb.scroll(pt)
+	/*restriccion para que la parte visualizada no quede corrida cuando se cambia de pestaña*/
+	if sb.size.H <= sb.H {
+		sb.size.dy = 0
+	}
 }
 
 // mueve la barra de desplazamiento cuando se arrastra

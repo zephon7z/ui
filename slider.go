@@ -31,7 +31,6 @@ func NewSlider(s string, w float64, atlas *text.Atlas, esq [4]bool, css *Css) *S
 	sl.R = NewR(0, 0, w, Cell_height)
 	conf := entregarCss(css, CssDefaultSlider)
 	sl.TypeWriter = NewTypeWriter(s, w, Cell_height, atlas, conf)
-	fmt.Println(conf.Aling, "slider", CssDefaultSlider.Aling, Center)
 	img := CrearImgRect(w, Cell_height+1, conf.Border_Radius, conf.Bar_color, conf.border_Color, esq)
 	sl.barra = pixel.NewSprite(img, img.Bounds())
 	sl.frente = NewFrame(NewR(0, 0, w, Cell_height), conf.Border_Radius, conf.Border_Width, esq, conf.border_Color, conf.Normal_color)
@@ -41,7 +40,7 @@ func NewSlider(s string, w float64, atlas *text.Atlas, esq [4]bool, css *Css) *S
 	return sl
 }
 
-func (sl *Slider) SetValues(val float64, min float64, max float64) {
+func (sl *Slider) SetRange(val float64, min float64, max float64) {
 	sl.val = val
 	sl.min = min
 	sl.max = max
@@ -86,6 +85,12 @@ func (sl *Slider) Desactivar() {
 
 func (sl *Slider) SetVal(x float64) {
 	sl.val = x
+	if sl.val > sl.max {
+		sl.val = sl.max
+	}
+	if sl.val < sl.min {
+		sl.val = sl.min
+	}
 }
 
 /*
@@ -115,6 +120,7 @@ func (sl *Slider) cambiarEstado(pt *P) {
 				if mouse.Dx != 0 {
 					sl.estado = Press
 					mouse.foco = sl
+					mouse.FijarH = true
 				}
 			}
 			if mouse.Soltar {
@@ -126,6 +132,8 @@ func (sl *Slider) cambiarEstado(pt *P) {
 	if mouse.foco == sl {
 		if mouse.Soltar {
 			sl.Desactivar()
+			fmt.Println(234)
+			mouse.FijarH = false
 		}
 	}
 }
@@ -133,7 +141,7 @@ func (sl *Slider) cambiarEstado(pt *P) {
 // sirve para las funciones
 func (sl *Slider) Accionar(pt *P) {
 	sl.cambiarEstado(pt)
-	if sl.estado == Press {
+	if sl.estado == Press && mouse.foco == sl {
 		sl.val = sl.min + (sl.max-sl.min)*sl.calcValor(pt)
 	}
 }
@@ -146,6 +154,10 @@ func (sl *Slider) dibBarra(target pixel.Target) {
 	y := sl.Y + sl.barra.Frame().H()/2 - 1
 	mat = mat.Moved(pixel.V(x, y))
 	sl.barra.Draw(target, mat)
+}
+
+func (sl *Slider) GetVal() float64 {
+	return sl.val
 }
 
 // dibuja el valor en el centro de la slice

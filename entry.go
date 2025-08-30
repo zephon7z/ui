@@ -59,6 +59,15 @@ func (en *Entry) GetProp() *Css {
 	return en.conf
 }
 
+func (en *Entry) SetString(s string) {
+	en.TypeWriter.Cadena = s
+	en.texto.S = s
+}
+
+func (en *Entry) GetString() string {
+	return en.TypeWriter.Cadena
+}
+
 func (en *Entry) Desactivar() {
 	mouse.foco = nil
 	focoTypeWriter = nil
